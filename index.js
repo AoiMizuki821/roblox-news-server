@@ -19,11 +19,16 @@ app.get("/today", async (req, res) => {
         const parser = new XMLParser();
         const jsonData = parser.parse(xmlText);
 
-        const items = jsonData.rss.channel.item.slice(0, 5).map(item => ({
-            title: item.title,
-            link: item.link,
-            pubDate: item.pubDate
-        }));
+       const items = jsonData.rss.channel.item.slice(0, 5).map(item => {
+    const date = new Date(item.pubDate);
+    const formatted = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+
+    return {
+        title: item.title,
+        pubDate: formatted,
+        description: item.description || ""
+    };
+});
 
         res.json(items);
 
