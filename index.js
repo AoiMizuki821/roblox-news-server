@@ -1,7 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-import { XMLParser } from "fast-xml-parser";
 
 dotenv.config();
 
@@ -11,30 +10,40 @@ const PORT = process.env.PORT || 3000;
 app.get("/today", async (req, res) => {
     try {
         const response = await fetch(
-            "https://www3.nhk.or.jp/rss/news/cat0.xml"
+            `https://newsdata.io/api/1/news?apikey=${process.env.NEWSDATA_KEY}&country=jp&language=ja`
         );
 
-        const xmlText = await response.text();
+        const data = await response.json();
 
-        const parser = new XMLParser();
-        const jsonData = parser.parse(xmlText);
+        console.log("API RESPONSE:", data);
 
-       const items = jsonData.rss.channel.item.slice(0, 5).map(item => {
-    const date = new Date(item.pubDate);
-    const formatted = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+        if (data.status !== "success") {
+            return res.status(500).json(data);
+        }
 
-    return {
-        title: item.title,
-        pubDate: formatted,
-        description: item.description || ""
-    };
-});
+        if (!Array.isArray(data.results)) {
+            return res.status(500).json({ error: "Results is not array", raw: data });
+        }
+const unique = [];
+const seen = new Set();
+
+for (const article of data.results) {
+    if (!seen.has(article.title)) {
+        seen.add(article.title);
+        unique.push(article);
+    }
+}
+        const items = data.results.slice(0, 5).map(article => ({
+            title: article.title,
+            description: article.description || "",
+            pubDate: article.pubDate || ""
+        }));
 
         res.json(items);
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to fetch NHK RSS" });
+        console.error("ERROR:", err);
+        res.status(500).json({ error: "Failed to fetch NewsData" });
     }
 });
 
