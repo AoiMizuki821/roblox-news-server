@@ -41,7 +41,7 @@ app.get("/today", async (req, res) => {
                 .replace(/（.*?）/g, "")   // 括弧内削除
                 .replace(/\(.*?\)/g, "")   // 半角括弧削除
                 .replace(/\s/g, "")        // 空白削除
-                .slice(0,);             // 先頭30文字
+                .slice(0,5);             // 先頭30文字
 
             if (!seen.has(normalized)) {
                 seen.add(normalized);
