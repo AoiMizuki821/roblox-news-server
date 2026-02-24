@@ -13,8 +13,7 @@ app.get("/today", async (req, res) => {
         const url =
             `https://newsdata.io/api/1/news?apikey=${process.env.NEWSDATA_KEY}` +
             `&country=jp&language=ja` +
-            `&excludecategory=entertainment` +
-            `&excludedomain=5ch.net,hayabusa5ch.net,blog.jp,fc2.com,ameblo.jp`;
+            `&category=politics,business,world`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -41,7 +40,7 @@ app.get("/today", async (req, res) => {
                 .replace(/（.*?）/g, "")   // 括弧内削除
                 .replace(/\(.*?\)/g, "")   // 半角括弧削除
                 .replace(/\s/g, "")        // 空白削除
-                .slice(0,5);             // 先頭30文字
+                .slice(0, 5);             // 先頭5文字
 
             if (!seen.has(normalized)) {
                 seen.add(normalized);
