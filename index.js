@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.get("/today", async (req, res) => {
     try {
         const response = await fetch(
-            `https://newsdata.io/api/1/news?apikey=${process.env.NEWSDATA_KEY}&country=jp&language=ja`
+            `https://newsdata.io/api/1/news?apikey=${process.env.NEWSDATA_KEY}&country=jp&language=ja&excludecategory=entertainment`
         );
 
         const data = await response.json();
