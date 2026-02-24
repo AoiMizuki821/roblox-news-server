@@ -28,12 +28,23 @@ app.get("/today", async (req, res) => {
         }
 
         // 🔹 重複除去
+        // 🔹 類似タイトル重複除去（先頭5文字で判定）
+
         const unique = [];
         const seen = new Set();
 
         for (const article of data.results) {
-            if (article.title && !seen.has(article.title)) {
-                seen.add(article.title);
+            if (!article.title) continue;
+
+            // タイトルを正規化
+            let normalized = article.title
+                .replace(/（.*?）/g, "")   // 括弧内削除
+                .replace(/\(.*?\)/g, "")   // 半角括弧削除
+                .replace(/\s/g, "")        // 空白削除
+                .slice(0,);             // 先頭30文字
+
+            if (!seen.has(normalized)) {
+                seen.add(normalized);
                 unique.push(article);
             }
         }
